@@ -122,7 +122,7 @@ export const logout = async(req, res) => {
   res.status(200).json({success: true, message: "Logged out successfully"});
 };
 
-export const forgotPassword = async(req, res) => {
+export const forgotPassword = async (req, res) => {
   const { email } = req.body;
 
   try {
@@ -149,9 +149,9 @@ export const forgotPassword = async(req, res) => {
     console.log("Error in forgotPassword: ", error);
     res.status(400).json({ success: false, message: error.message });
   }
-}
+};
 
-export const resetPassword = async (req, res) => { 
+export const resetPassword = async (req, res) => {
   const { token } = req.params
   const { password } = req.body
   
@@ -174,10 +174,24 @@ export const resetPassword = async (req, res) => {
   
     await sendResetSuccessEmail(user.email);
   
-    res.status(200).json({success: true, message: "Password reset successful"});
+    res.status(200).json({ success: true, message: "Password reset successful" });
     
   } catch (error) {
     console.log("Error in resetPassword: ", error);
+    res.status(400).json({ success: false, message: error.message });
+  }
+};
+
+export const checkAuth = async (req, res) => {
+  try {
+    const user = await User.findById(req.userId).select("-password");
+    if (!user) { 
+      return res.status(400).json({ success: false, message: "User not found" });
+    }
+
+    res.status(200).json({ success: true, user });
+  } catch (error) {
+    console.log("Error in checkAuth ", error);
     res.status(400).json({ success: false, message: error.message });
   }
 }
